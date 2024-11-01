@@ -1,9 +1,16 @@
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
+import { RenderMounted } from "@/components/render_mounted";
 import { ADMIN } from "@/constants/consntants";
 import { createClient } from "@/supabase/server";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
-const AdminLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
+export default async function AdminLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
   const supabase = createClient();
 
   const { data: authData } = await (await supabase).auth.getUser();
@@ -16,14 +23,18 @@ const AdminLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
       .single();
 
     if (error || !data) {
-      console.error(`Error fetching user data! ${error}`);
+      console.log("Error fetching user data", error);
       return;
     }
 
     if (data.type === ADMIN) return redirect("/");
   }
 
-  return <>{children}</>;
-};
-
-export default AdminLayout;
+  return (
+    <RenderMounted>
+      <Header />
+      <main className="min-h-[calc(100svh-128px)] py-3">{children}</main>
+      <Footer />
+    </RenderMounted>
+  );
+}
