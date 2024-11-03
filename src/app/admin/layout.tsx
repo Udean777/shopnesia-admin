@@ -11,12 +11,12 @@ export default async function AdminLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
-  const { data: authData } = await (await supabase).auth.getUser();
+  const { data: authData } = await supabase.auth.getUser();
 
   if (authData?.user) {
-    const { data, error } = await (await supabase)
+    const { data, error } = await supabase
       .from("users")
       .select("*")
       .eq("id", authData.user.id)
